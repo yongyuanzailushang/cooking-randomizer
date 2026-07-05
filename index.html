@@ -1,0 +1,1959 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>今日炒什么</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f5f7;
+      --ink: #1d1d1f;
+      --muted: #6e6e73;
+      --line: rgba(60, 60, 67, 0.16);
+      --card: rgba(255, 255, 255, 0.8);
+      --solid: #fff;
+      --blue: #007aff;
+      --green: #34c759;
+      --orange: #ff9f0a;
+      --red: #ff3b30;
+      --purple: #af52de;
+      --shadow: 0 20px 56px rgba(0, 0, 0, 0.16);
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+      font-family: var(--font);
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 12%, rgba(52, 199, 89, 0.16), transparent 28%),
+        radial-gradient(circle at 90% 8%, rgba(255, 159, 10, 0.14), transparent 28%),
+        linear-gradient(145deg, #f7f7f8 0%, #eceef2 52%, #f6f0ec 100%);
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 28px;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .stage {
+      width: min(100%, 430px);
+      display: grid;
+      justify-items: center;
+    }
+
+    .phone {
+      width: min(100%, 390px);
+      height: min(844px, calc(100vh - 36px));
+      min-height: 720px;
+      padding: 12px;
+      border-radius: 46px;
+      background: linear-gradient(145deg, #2c2c2e, #0f1012);
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .phone::before {
+      content: "";
+      position: absolute;
+      inset: 5px;
+      border-radius: 42px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      pointer-events: none;
+    }
+
+    .screen {
+      height: 100%;
+      overflow: hidden;
+      border-radius: 36px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.93), rgba(244, 244, 247, 0.95)), var(--bg);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .screen::before {
+      content: "";
+      width: 126px;
+      height: 36px;
+      border-radius: 0 0 20px 20px;
+      background: #111114;
+      position: absolute;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+      z-index: 5;
+    }
+
+    .status {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      font-size: 13px;
+      font-weight: 700;
+      position: relative;
+      z-index: 6;
+    }
+
+    .signal {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .battery {
+      width: 25px;
+      height: 12px;
+      border: 1.7px solid currentColor;
+      border-radius: 4px;
+      position: relative;
+    }
+
+    .battery::before {
+      content: "";
+      position: absolute;
+      right: -4px;
+      top: 3px;
+      width: 2px;
+      height: 5px;
+      border-radius: 2px;
+      background: currentColor;
+    }
+
+    .battery::after {
+      content: "";
+      position: absolute;
+      left: 2px;
+      top: 2px;
+      width: 16px;
+      height: 6px;
+      border-radius: 2px;
+      background: currentColor;
+    }
+
+    .app {
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .view {
+      display: none;
+      height: 100%;
+      overflow-y: auto;
+      padding: 4px 16px 94px;
+      scroll-behavior: smooth;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .view::-webkit-scrollbar {
+      width: 0;
+    }
+
+    .topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 0;
+      font-size: 31px;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin-bottom: 14px;
+      max-width: 292px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .today {
+      min-width: 56px;
+      height: 56px;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .today strong {
+      display: block;
+      font-size: 19px;
+      line-height: 1;
+      text-align: center;
+    }
+
+    .today span {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      margin-top: 3px;
+      text-align: center;
+    }
+
+    .visual {
+      height: 168px;
+      margin: 12px 0 14px;
+      border-radius: 22px;
+      overflow: hidden;
+      position: relative;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.34)),
+        url("assets/cartoon-theme.jpg") center 42% / cover no-repeat;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 14px 34px rgba(71, 45, 29, 0.14);
+    }
+
+    .visual::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.34), transparent 44%), linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.34));
+      pointer-events: none;
+    }
+
+    .theme-badge {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      z-index: 2;
+      max-width: 190px;
+      padding: 9px 11px;
+      border-radius: 16px;
+      color: #fff;
+      background: rgba(28, 28, 30, 0.42);
+      border: 1px solid rgba(255, 255, 255, 0.34);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .theme-badge b {
+      display: block;
+      font-size: 15px;
+      line-height: 1.15;
+      margin-bottom: 3px;
+    }
+
+    .theme-badge span {
+      display: block;
+      font-size: 11px;
+      line-height: 1.3;
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    .plate {
+      display: none;
+      position: absolute;
+      width: 184px;
+      height: 88px;
+      left: 18px;
+      bottom: 15px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #fff, #e7e7ea);
+      box-shadow: 0 16px 30px rgba(72, 52, 42, 0.12);
+    }
+
+    .plate::after {
+      content: "";
+      position: absolute;
+      inset: 14px 25px;
+      border-radius: 50%;
+      border: 1px solid rgba(60, 60, 67, 0.12);
+    }
+
+    .veg {
+      display: none;
+      position: absolute;
+      border-radius: 999px;
+      transform: rotate(var(--r));
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .eggplant {
+      width: 104px;
+      height: 28px;
+      left: 62px;
+      bottom: 57px;
+      --r: -18deg;
+      background: linear-gradient(90deg, #4b1f62, #7d3aa2 70%, #b884d9);
+    }
+
+    .cucumber {
+      width: 116px;
+      height: 24px;
+      left: 112px;
+      bottom: 35px;
+      --r: 10deg;
+      background: linear-gradient(90deg, #2a7d3a, #67be55 62%, #9ddd76);
+    }
+
+    .pepper {
+      width: 88px;
+      height: 25px;
+      left: 44px;
+      bottom: 34px;
+      --r: 24deg;
+      background: linear-gradient(90deg, #187a37, #2dbb5d);
+    }
+
+    .tomato {
+      width: 44px;
+      height: 39px;
+      left: 153px;
+      bottom: 59px;
+      --r: -4deg;
+      background: radial-gradient(circle at 34% 28%, #ffb0a9 0 12%, #ff453a 13% 68%, #c31e16 100%);
+    }
+
+    .beans {
+      width: 124px;
+      height: 13px;
+      left: 30px;
+      bottom: 75px;
+      --r: 9deg;
+      background: linear-gradient(90deg, #236e32, #42b351);
+    }
+
+    .steam {
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      z-index: 2;
+      width: 92px;
+      height: 74px;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.42);
+      background: rgba(255, 255, 255, 0.26);
+      backdrop-filter: blur(18px);
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      gap: 4px;
+    }
+
+    .steam b {
+      font-size: 24px;
+      line-height: 1;
+      color: #fff;
+    }
+
+    .steam span {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    .section {
+      margin-top: 14px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 2px 8px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.2;
+    }
+
+    .count,
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .glass {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.74);
+      border-radius: 22px;
+      backdrop-filter: blur(22px);
+      box-shadow: 0 12px 34px rgba(0, 0, 0, 0.08);
+    }
+
+    .random-card {
+      padding: 14px;
+      display: grid;
+      gap: 11px;
+      min-height: 154px;
+    }
+
+    .dish-kicker {
+      color: var(--muted);
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .dish-name {
+      margin: 0;
+      font-size: 25px;
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .pill,
+    .mini {
+      min-height: 27px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      color: #3a3a3c;
+      background: rgba(118, 118, 128, 0.12);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .mini {
+      background: rgba(0, 122, 255, 0.1);
+      color: #0057b8;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .primary,
+    .secondary,
+    .upload-btn {
+      min-height: 48px;
+      border-radius: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 700;
+      transition: transform 0.18s ease, filter 0.18s ease, opacity 0.18s ease;
+    }
+
+    .primary {
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(0, 122, 255, 0.28);
+    }
+
+    .secondary,
+    .upload-btn {
+      background: rgba(255, 255, 255, 0.76);
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .primary:disabled {
+      opacity: 0.72;
+      cursor: default;
+    }
+
+    .chip:active,
+    .recipe:active,
+    .meal-item:active,
+    .primary:active:not(:disabled),
+    .secondary:active,
+    .icon-btn:active,
+    .upload-btn:active {
+      transform: scale(0.97);
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 12px;
+    }
+
+    .chip {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+    }
+
+    .chip.selected {
+      color: #fff;
+      border-color: transparent;
+      background: var(--accent, var(--blue));
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--accent, var(--blue));
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+    }
+
+    .chip.selected .dot {
+      background: rgba(255, 255, 255, 0.86);
+    }
+
+    .add-row {
+      display: grid;
+      grid-template-columns: 1fr 42px;
+      gap: 8px;
+      padding: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .add-row input {
+      width: 100%;
+      min-height: 42px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--ink);
+      padding: 0 12px;
+      outline: 0;
+    }
+
+    .add-row input:focus {
+      border-color: rgba(0, 122, 255, 0.48);
+      box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.12);
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: var(--ink);
+      color: #fff;
+      transition: transform 0.18s ease;
+    }
+
+    .recipe-list,
+    .meal-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .recipe,
+    .meal-item {
+      width: 100%;
+      text-align: left;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.84);
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      padding: 12px;
+      color: var(--ink);
+      display: grid;
+      grid-template-columns: 56px 1fr 18px;
+      gap: 11px;
+      align-items: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      transition: transform 0.18s ease;
+    }
+
+    .thumb {
+      width: 56px;
+      height: 56px;
+      border-radius: 17px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--a), var(--b));
+      color: #fff;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumb:not(.has-photo)::before,
+    .thumb:not(.has-photo)::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.44);
+      transform: rotate(-26deg);
+    }
+
+    .thumb:not(.has-photo)::before {
+      width: 50px;
+      height: 13px;
+      left: -8px;
+      top: 15px;
+    }
+
+    .thumb:not(.has-photo)::after {
+      width: 40px;
+      height: 11px;
+      right: -5px;
+      bottom: 12px;
+    }
+
+    .recipe h3,
+    .meal-item h3 {
+      margin: 0 0 5px;
+      font-size: 15px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .recipe p,
+    .meal-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .chevron {
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid rgba(60, 60, 67, 0.34);
+      border-bottom: 2px solid rgba(60, 60, 67, 0.34);
+      transform: rotate(-45deg);
+    }
+
+    .empty {
+      padding: 18px 14px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .stat {
+      padding: 12px 10px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.74);
+      text-align: center;
+    }
+
+    .stat b {
+      display: block;
+      font-size: 21px;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .calendar {
+      padding: 12px;
+    }
+
+    .calendar-head,
+    .week,
+    .days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+
+    .calendar-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .calendar-title h2 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .week {
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .day {
+      aspect-ratio: 1;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(60, 60, 67, 0.08);
+      display: grid;
+      place-items: center;
+      position: relative;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .day.current {
+      color: #fff;
+      background: var(--blue);
+      font-weight: 800;
+    }
+
+    .day.has-meal::after {
+      content: "";
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      bottom: 6px;
+      background: var(--green);
+    }
+
+    .day.current.has-meal::after {
+      background: #fff;
+    }
+
+    .tabbar {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      height: 70px;
+      border-radius: 0 0 34px 34px;
+      background: rgba(248, 248, 248, 0.86);
+      border-top: 1px solid rgba(60, 60, 67, 0.12);
+      backdrop-filter: blur(24px);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 8px 10px 14px;
+      z-index: 4;
+    }
+
+    .tab {
+      display: grid;
+      justify-items: center;
+      align-content: center;
+      gap: 3px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 11px;
+    }
+
+    .tab.active {
+      color: var(--blue);
+    }
+
+    .modal {
+      position: absolute;
+      inset: 0;
+      z-index: 9;
+      display: none;
+      align-items: end;
+      background: rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(7px);
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .sheet {
+      width: 100%;
+      max-height: 82%;
+      overflow: hidden;
+      background: #f8f8fa;
+      border-radius: 28px 28px 36px 36px;
+      box-shadow: 0 -18px 48px rgba(0, 0, 0, 0.18);
+      display: flex;
+      flex-direction: column;
+      animation: sheetUp 0.24s ease both;
+    }
+
+    @keyframes sheetUp {
+      from {
+        transform: translateY(24px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .sheet-head {
+      padding: 12px 16px 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .grabber {
+      width: 42px;
+      height: 5px;
+      border-radius: 999px;
+      margin: 0 auto 12px;
+      background: rgba(60, 60, 67, 0.24);
+    }
+
+    .sheet-title-row {
+      display: grid;
+      grid-template-columns: 1fr 38px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .sheet h2 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .close {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      color: #636366;
+      background: rgba(118, 118, 128, 0.14);
+    }
+
+    .sheet-body {
+      overflow-y: auto;
+      padding: 14px 16px 24px;
+    }
+
+    .sheet-photo {
+      width: 100%;
+      height: 170px;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, var(--a), var(--b));
+      position: relative;
+      display: grid;
+      place-items: center;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 800;
+    }
+
+    .sheet-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .ingredients-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+
+    .steps {
+      counter-reset: step;
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .steps li {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      padding: 11px;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid rgba(60, 60, 67, 0.1);
+      color: #2b2b2d;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: #1d1d1f;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .hidden-file {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .toast {
+      position: absolute;
+      left: 50%;
+      bottom: 92px;
+      transform: translateX(-50%) translateY(16px);
+      min-width: 168px;
+      max-width: 280px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(28, 28, 30, 0.88);
+      color: #fff;
+      text-align: center;
+      font-size: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 12;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .icon {
+      width: 19px;
+      height: 19px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    @media (max-width: 520px) {
+      body {
+        padding: 0;
+        background: #f5f5f7;
+      }
+
+      .stage {
+        width: 100%;
+      }
+
+      .phone {
+        width: 100%;
+        height: 100dvh;
+        min-height: 100dvh;
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+        background: #f5f5f7;
+      }
+
+      .phone::before,
+      .screen::before {
+        display: none;
+      }
+
+      .screen {
+        border-radius: 0;
+      }
+
+      .status {
+        height: max(42px, env(safe-area-inset-top));
+        padding-top: env(safe-area-inset-top);
+      }
+
+      .tabbar {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 0;
+        height: calc(72px + env(safe-area-inset-bottom));
+        padding-bottom: calc(14px + env(safe-area-inset-bottom));
+      }
+
+      .view {
+        padding-bottom: calc(96px + env(safe-area-inset-bottom));
+      }
+
+      .sheet {
+        border-radius: 28px 28px 0 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <section class="phone" aria-label="iPhone 14 preview">
+      <div class="screen">
+        <div class="status" aria-hidden="true">
+          <span id="clock">9:41</span>
+          <span class="signal">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 18h.01M7 18h.01M11 18h.01M15 18h.01M19 18h.01"></path>
+              <path d="M7 18v-4M11 18v-7M15 18V8M19 18V5"></path>
+            </svg>
+            <span class="battery"></span>
+          </span>
+        </div>
+
+        <div class="app" id="app">
+          <section class="view active" id="homeView" data-view="home">
+            <div class="topline">
+              <div>
+                <h1>今日炒什么</h1>
+              </div>
+              <div class="today">
+                <strong id="recipeCount">0</strong>
+                <span>可做</span>
+              </div>
+            </div>
+            <p class="subtitle">不知道吃啥时，点一下随机。随机结果可以直接记到今天。</p>
+            <div class="visual" aria-hidden="true">
+              <div class="plate"></div>
+              <span class="veg beans"></span>
+              <span class="veg eggplant"></span>
+              <span class="veg cucumber"></span>
+              <span class="veg pepper"></span>
+              <span class="veg tomato"></span>
+              <div class="theme-badge"><b>我们的厨房小灵感</b><span>随机一道家常菜，记录每天吃什么</span></div>
+              <div class="steam"><b id="heroNumber">5</b><span>种现有食材</span></div>
+            </div>
+
+            <section class="section">
+              <div class="section-head">
+                <h2 class="section-title">随机结果</h2>
+                <span class="count" id="randomHint">可随机</span>
+              </div>
+              <article class="glass random-card" id="randomCard">
+                <div class="dish-kicker">
+                  <span id="randomTag">点一下随机</span>
+                  <span id="randomTime">约 0 分钟</span>
+                </div>
+                <h2 class="dish-name" id="randomName">等锅热起来</h2>
+                <div class="meta-row" id="randomMeta"></div>
+              </article>
+              <div class="toolbar">
+                <button class="primary" id="randomButton" type="button">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M16 3h5v5"></path>
+                    <path d="M4 20 21 3"></path>
+                    <path d="M21 16v5h-5"></path>
+                    <path d="M15 15l6 6"></path>
+                    <path d="M4 4l5 5"></path>
+                  </svg>
+                  随机一道
+                </button>
+                <button class="secondary" id="recordTodayButton" type="button">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4M16 2v4M3 10h18"></path><path d="M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2Z"></path></svg>
+                  记到今天
+                </button>
+              </div>
+            </section>
+
+            <section class="section">
+              <div class="summary-grid">
+                <div class="stat"><b id="homeIngredientCount">0</b><span>已选食材</span></div>
+                <div class="stat"><b id="homeRecipeCount">0</b><span>菜谱组合</span></div>
+                <div class="stat"><b id="homeMealCount">0</b><span>记录天数</span></div>
+              </div>
+            </section>
+          </section>
+
+          <section class="view" id="ingredientsView" data-view="ingredients">
+            <div class="topline">
+              <div>
+                <h1>食材</h1>
+              </div>
+              <div class="today">
+                <strong id="selectedCount">0</strong>
+                <span>已选</span>
+              </div>
+            </div>
+            <p class="subtitle">选择手头有的菜。新增蔬菜会自动参与菜谱组合，先生成“随手素炒”和搭配类菜谱。</p>
+            <div class="glass">
+              <div class="chips" id="ingredients"></div>
+              <form class="add-row" id="addForm">
+                <input id="newIngredient" maxlength="8" autocomplete="off" placeholder="添加新蔬菜，例如：土豆">
+                <button class="icon-btn" type="submit" aria-label="添加食材" title="添加食材">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+                </button>
+              </form>
+            </div>
+            <div class="toolbar">
+              <button class="secondary" id="selectAllButton" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+                全选
+              </button>
+              <button class="secondary" id="defaultOnlyButton" type="button">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 3v6h6"></path></svg>
+                默认五种
+              </button>
+            </div>
+          </section>
+
+          <section class="view" id="recipesView" data-view="recipes">
+            <div class="topline">
+              <div>
+                <h1>菜谱</h1>
+              </div>
+              <div class="today">
+                <strong id="listCount">0</strong>
+                <span>道</span>
+              </div>
+            </div>
+            <p class="subtitle">点击菜谱看步骤；点相机可上传你自己做过的照片当菜图。</p>
+            <div class="recipe-list" id="recipes"></div>
+          </section>
+
+          <section class="view" id="historyView" data-view="history">
+            <div class="topline">
+              <div>
+                <h1>记录</h1>
+              </div>
+              <div class="today">
+                <strong id="historyCount">0</strong>
+                <span>天</span>
+              </div>
+            </div>
+            <p class="subtitle">日历里有绿色点的日期，表示那天记录过做了什么饭。</p>
+            <section class="glass calendar">
+              <div class="calendar-title">
+                <button class="secondary" id="prevMonthButton" type="button" aria-label="上个月">‹</button>
+                <h2 id="calendarTitle">2026 年 7 月</h2>
+                <button class="secondary" id="nextMonthButton" type="button" aria-label="下个月">›</button>
+              </div>
+              <div class="week"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+              <div class="days" id="calendarDays"></div>
+            </section>
+            <section class="section">
+              <div class="section-head">
+                <h2 class="section-title">本月记录</h2>
+                <span class="count" id="monthMealCount">0 条</span>
+              </div>
+              <div class="meal-list" id="mealList"></div>
+            </section>
+          </section>
+        </div>
+
+        <nav class="tabbar" aria-label="底部导航">
+          <button class="tab active" type="button" data-tab="home" aria-label="首页">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11 12 4l9 7"></path><path d="M5 10v10h14V10"></path></svg>
+            <span>首页</span>
+          </button>
+          <button class="tab" type="button" data-tab="ingredients" aria-label="食材">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12l2 7-8 11L4 10l2-7Z"></path><path d="M9 10h6"></path></svg>
+            <span>食材</span>
+          </button>
+          <button class="tab" type="button" data-tab="recipes" aria-label="菜谱">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"></path></svg>
+            <span>菜谱</span>
+          </button>
+          <button class="tab" type="button" data-tab="history" aria-label="记录">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4M16 2v4M3 10h18"></path><path d="M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2Z"></path></svg>
+            <span>记录</span>
+          </button>
+        </nav>
+
+        <div class="modal" id="modal" aria-hidden="true">
+          <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+            <div class="sheet-head">
+              <div class="grabber"></div>
+              <div class="sheet-title-row">
+                <h2 id="sheetTitle">菜名</h2>
+                <button class="close" id="closeModal" type="button" aria-label="关闭">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+                </button>
+              </div>
+            </div>
+            <div class="sheet-body">
+              <div class="sheet-photo" id="sheetPhoto"></div>
+              <div class="ingredients-line" id="sheetIngredients"></div>
+              <div class="toolbar">
+                <label class="upload-btn" for="photoInput">
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z"></path><path d="M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"></path></svg>
+                  上传菜图
+                </label>
+                <button class="secondary" id="recordFromSheetButton" type="button">记到今天</button>
+              </div>
+              <input class="hidden-file" id="photoInput" type="file" accept="image/*">
+              <ol class="steps" id="sheetSteps"></ol>
+            </div>
+          </section>
+        </div>
+        <div class="toast" id="toast"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const starterIngredients = [
+      { name: "茄子", color: "#7d3aa2" },
+      { name: "黄瓜", color: "#34a853" },
+      { name: "青椒", color: "#19a85b" },
+      { name: "西红柿", color: "#ff453a" },
+      { name: "豆角", color: "#5aaa32" }
+    ];
+
+    const baseRecipes = [
+      {
+        id: "eggplant-pepper",
+        name: "青椒烧茄子",
+        ingredients: ["茄子", "青椒"],
+        time: 18,
+        flavor: "软糯微辣",
+        colors: ["#7d3aa2", "#22a65a"],
+        steps: [
+          "茄子切滚刀块，撒一小撮盐抓匀，静置 8 分钟后挤掉水分。",
+          "青椒切块；蒜切末。锅里油稍多一点，先把茄子煎到边缘变软。",
+          "下蒜末和青椒翻炒 40 秒，淋生抽，加少量清水焖 2 分钟。",
+          "开盖补盐，沿锅边点几滴醋，翻匀收汁出锅。"
+        ]
+      },
+      {
+        id: "tomato-eggplant",
+        name: "西红柿烧茄子",
+        ingredients: ["西红柿", "茄子"],
+        time: 20,
+        flavor: "酸甜下饭",
+        colors: ["#ff453a", "#7d3aa2"],
+        steps: [
+          "茄子切条后用盐抓一下，西红柿切块，蒜切末。",
+          "热锅下油，放茄子煎软，盛出备用。",
+          "锅里留底油炒香蒜末，下西红柿和一点盐，炒到出汁。",
+          "倒回茄子，加生抽和一点糖，小火烧 3 分钟，汤汁挂住茄子即可。"
+        ]
+      },
+      {
+        id: "beans-eggplant",
+        name: "茄子炒豆角",
+        ingredients: ["茄子", "豆角"],
+        time: 22,
+        flavor: "咸香耐吃",
+        colors: ["#7d3aa2", "#5aaa32"],
+        steps: [
+          "豆角掐段，茄子切条；豆角先焯水 2 分钟，捞出沥干。",
+          "锅中热油，先煸豆角到表皮微皱，再下茄子翻炒。",
+          "加入蒜末、生抽和少量清水，盖盖焖 3 分钟。",
+          "开盖加盐，转大火把水汽炒干，出锅前点一点醋。"
+        ]
+      },
+      {
+        id: "tomato-beans",
+        name: "西红柿炒豆角",
+        ingredients: ["西红柿", "豆角"],
+        time: 17,
+        flavor: "清爽酸香",
+        colors: ["#ff453a", "#5aaa32"],
+        steps: [
+          "豆角切小段并焯到断生；西红柿切块。",
+          "热锅下油，蒜末爆香后放西红柿，加一点盐炒出汁。",
+          "倒入豆角，加生抽翻炒 2 分钟，让豆角裹上番茄汁。",
+          "尝味补盐，喜欢酸一点可沿锅边淋少量醋。"
+        ]
+      },
+      {
+        id: "pepper-beans",
+        name: "青椒炒豆角",
+        ingredients: ["青椒", "豆角"],
+        time: 16,
+        flavor: "脆嫩鲜辣",
+        colors: ["#19a85b", "#5aaa32"],
+        steps: [
+          "豆角斜切细段，青椒切丝，蒜切片。",
+          "豆角先入锅干煸 2 分钟，再补油继续炒到颜色变深。",
+          "下青椒和蒜片快速翻炒，加盐、生抽调味。",
+          "锅边淋一勺清水，翻到水汽收干，保持青椒微脆。"
+        ]
+      },
+      {
+        id: "cucumber-pepper",
+        name: "青椒炒黄瓜片",
+        ingredients: ["黄瓜", "青椒"],
+        time: 10,
+        flavor: "快手脆口",
+        colors: ["#34a853", "#19a85b"],
+        steps: [
+          "黄瓜斜切薄片，青椒切片；黄瓜用少量盐抓 3 分钟后倒掉水。",
+          "热锅冷油，下蒜末和青椒炒香。",
+          "倒入黄瓜片，大火翻炒 50 秒。",
+          "加盐和几滴醋，马上出锅，保留清脆口感。"
+        ]
+      },
+      {
+        id: "tomato-pepper",
+        name: "西红柿炒青椒",
+        ingredients: ["西红柿", "青椒"],
+        time: 11,
+        flavor: "酸辣开胃",
+        colors: ["#ff453a", "#19a85b"],
+        steps: [
+          "西红柿切块，青椒掰成小片。",
+          "锅里放油，先炒青椒到表面起虎皮点，盛出。",
+          "下西红柿和盐炒出红汁，再倒回青椒。",
+          "加少量生抽，翻炒均匀后大火收一下汁。"
+        ]
+      },
+      {
+        id: "tomato-cucumber",
+        name: "番茄炒黄瓜片",
+        ingredients: ["西红柿", "黄瓜"],
+        time: 9,
+        flavor: "轻盈酸甜",
+        colors: ["#ff453a", "#34a853"],
+        steps: [
+          "黄瓜切片，西红柿切小块，蒜切末。",
+          "热油炒香蒜末，下西红柿加盐炒出一点汤汁。",
+          "放入黄瓜片，大火快速翻炒 40 秒。",
+          "加一点糖平衡酸味，黄瓜刚变亮就关火。"
+        ]
+      },
+      {
+        id: "tomato-eggplant-beans",
+        name: "番茄茄子焖豆角",
+        ingredients: ["西红柿", "茄子", "豆角"],
+        time: 25,
+        flavor: "浓汁拌饭",
+        colors: ["#ff453a", "#7d3aa2"],
+        steps: [
+          "豆角切段焯水，茄子切块，西红柿切丁。",
+          "锅里油热后煎软茄子，再放豆角翻炒。",
+          "下西红柿、蒜末、生抽和少量水，盖盖焖 5 分钟。",
+          "开盖加盐和一点糖，收成浓稠汤汁。"
+        ]
+      },
+      {
+        id: "five-veg",
+        name: "五蔬家常小炒",
+        ingredients: ["茄子", "黄瓜", "青椒", "西红柿", "豆角"],
+        time: 24,
+        flavor: "一锅清空",
+        colors: ["#ff9f0a", "#34c759"],
+        steps: [
+          "豆角先焯水，茄子切小块，黄瓜和青椒切片，西红柿切块。",
+          "热锅下油，先炒茄子和豆角，到茄子明显变软。",
+          "放西红柿炒出汁，加生抽、盐和一点糖焖 2 分钟。",
+          "最后放青椒和黄瓜，大火翻炒 1 分钟，保留脆感后出锅。"
+        ]
+      },
+      {
+        id: "fish-fragrant-style",
+        name: "鱼香风味茄子青椒",
+        ingredients: ["茄子", "青椒"],
+        time: 19,
+        flavor: "酸甜咸香",
+        colors: ["#af52de", "#ff3b30"],
+        steps: [
+          "茄子切条煎软，青椒切丝，蒜切末。",
+          "用生抽、醋、糖、少量盐和半碗水调一碗汁。",
+          "锅里炒香蒜末，倒入茄子和青椒快速翻炒。",
+          "淋入调好的汁，中火收浓，汤汁亮起来就装盘。"
+        ]
+      },
+      {
+        id: "pepper-tomato-eggplant",
+        name: "青椒番茄烧茄子",
+        ingredients: ["青椒", "西红柿", "茄子"],
+        time: 21,
+        flavor: "软糯带鲜",
+        colors: ["#19a85b", "#ff453a"],
+        steps: [
+          "茄子切块用盐抓一下，青椒切片，西红柿切块。",
+          "锅里放油，先把茄子煎到软塌。",
+          "下西红柿炒出汁，再加青椒和蒜末翻炒。",
+          "加生抽、盐和少量水焖 2 分钟，收汁后出锅。"
+        ]
+      }
+    ];
+
+    const pairBases = [
+      { name: "西红柿", prefix: "番茄", flavor: "酸甜开胃", colors: ["#ff453a", "#ff9f0a"] },
+      { name: "青椒", prefix: "青椒", flavor: "清香微辣", colors: ["#19a85b", "#34c759"] },
+      { name: "茄子", prefix: "茄子", flavor: "软糯下饭", colors: ["#7d3aa2", "#af52de"] },
+      { name: "豆角", prefix: "豆角", flavor: "咸香脆嫩", colors: ["#5aaa32", "#34c759"] },
+      { name: "黄瓜", prefix: "黄瓜", flavor: "清爽快手", colors: ["#34a853", "#8bd36a"] }
+    ];
+
+    const state = {
+      ingredients: [],
+      selected: new Set(),
+      randomRecipe: null,
+      photos: {},
+      meals: {},
+      randomHistory: {},
+      activeRecipe: null,
+      activeTab: "home",
+      calendarDate: new Date()
+    };
+
+    const $ = id => document.getElementById(id);
+    const els = {
+      clock: $("clock"),
+      views: document.querySelectorAll(".view"),
+      tabs: document.querySelectorAll(".tab"),
+      ingredients: $("ingredients"),
+      selectedCount: $("selectedCount"),
+      recipeCount: $("recipeCount"),
+      heroNumber: $("heroNumber"),
+      homeIngredientCount: $("homeIngredientCount"),
+      homeRecipeCount: $("homeRecipeCount"),
+      homeMealCount: $("homeMealCount"),
+      addForm: $("addForm"),
+      newIngredient: $("newIngredient"),
+      randomButton: $("randomButton"),
+      recordTodayButton: $("recordTodayButton"),
+      selectAllButton: $("selectAllButton"),
+      defaultOnlyButton: $("defaultOnlyButton"),
+      randomHint: $("randomHint"),
+      randomTag: $("randomTag"),
+      randomTime: $("randomTime"),
+      randomName: $("randomName"),
+      randomMeta: $("randomMeta"),
+      randomCard: $("randomCard"),
+      recipes: $("recipes"),
+      listCount: $("listCount"),
+      historyCount: $("historyCount"),
+      calendarTitle: $("calendarTitle"),
+      calendarDays: $("calendarDays"),
+      prevMonthButton: $("prevMonthButton"),
+      nextMonthButton: $("nextMonthButton"),
+      monthMealCount: $("monthMealCount"),
+      mealList: $("mealList"),
+      modal: $("modal"),
+      closeModal: $("closeModal"),
+      sheetTitle: $("sheetTitle"),
+      sheetPhoto: $("sheetPhoto"),
+      sheetIngredients: $("sheetIngredients"),
+      sheetSteps: $("sheetSteps"),
+      photoInput: $("photoInput"),
+      recordFromSheetButton: $("recordFromSheetButton"),
+      toast: $("toast")
+    };
+
+    function recipeKey(recipe) {
+      return recipe.id || recipe.name;
+    }
+
+    function todayKey() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    function loadState() {
+      const stored = JSON.parse(localStorage.getItem("cookRandomizerV2") || "{}");
+      const legacy = JSON.parse(localStorage.getItem("cookRandomizer") || "{}");
+      const extras = Array.isArray(stored.extras) ? stored.extras : Array.isArray(legacy.extras) ? legacy.extras : [];
+      state.ingredients = [...starterIngredients, ...extras.map((name, index) => ({
+        name,
+        color: ["#007aff", "#ff9f0a", "#af52de", "#5856d6"][index % 4]
+      }))];
+      const selected = Array.isArray(stored.selected) ? stored.selected : Array.isArray(legacy.selected) ? legacy.selected : starterIngredients.map(item => item.name);
+      state.selected = new Set(selected.filter(name => state.ingredients.some(item => item.name === name)));
+      if (!state.selected.size) {
+        state.selected = new Set(starterIngredients.map(item => item.name));
+      }
+      state.photos = stored.photos && typeof stored.photos === "object" ? stored.photos : {};
+      state.meals = stored.meals && typeof stored.meals === "object" ? stored.meals : {};
+      state.randomHistory = stored.randomHistory && typeof stored.randomHistory === "object" ? stored.randomHistory : {};
+    }
+
+    function saveState() {
+      const starterNames = new Set(starterIngredients.map(item => item.name));
+      const extras = state.ingredients.map(item => item.name).filter(name => !starterNames.has(name));
+      localStorage.setItem("cookRandomizerV2", JSON.stringify({
+        extras,
+        selected: [...state.selected],
+        photos: state.photos,
+        meals: state.meals,
+        randomHistory: state.randomHistory
+      }));
+    }
+
+    function allRecipes() {
+      const extras = state.ingredients.map(item => item.name).filter(name => !starterIngredients.some(base => base.name === name));
+      const generated = [];
+      extras.forEach(extra => {
+        generated.push(makeCustomRecipe([extra, ...starterIngredients.map(item => item.name).slice(0, 2)], `${extra}家常小炒`));
+        pairBases.forEach(base => {
+          if (state.ingredients.some(item => item.name === base.name)) {
+            generated.push({
+              id: `auto-${extra}-${base.name}`,
+              name: `${base.prefix}炒${extra}`,
+              ingredients: [base.name, extra],
+              time: base.name === "黄瓜" ? 10 : 15,
+              flavor: base.flavor,
+              colors: base.colors,
+              steps: [
+                `${extra}和${base.name}洗净切成适合入口的片或段，蒜切末备用。`,
+                `热锅下油，先放更难熟的${extra}，翻炒到边缘略微变软。`,
+                `加入${base.name}和蒜末，大火翻炒 1 到 2 分钟。`,
+                "加盐、生抽调味，锅边淋少量清水，炒到断生后出锅。"
+              ]
+            });
+          }
+        });
+      });
+      return dedupeRecipes([...baseRecipes, ...generated]);
+    }
+
+    function dedupeRecipes(list) {
+      const seen = new Set();
+      return list.filter(recipe => {
+        const key = recipe.name;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    function availableRecipes() {
+      const selected = state.selected;
+      const matched = allRecipes().filter(recipe => recipe.ingredients.every(name => selected.has(name)));
+      if (matched.length === 0 && selected.size >= 2) {
+        return [makeCustomRecipe([...selected].slice(0, 5), "随手素炒")];
+      }
+      return matched;
+    }
+
+    function makeCustomRecipe(names, name = "随手素炒") {
+      return {
+        id: `custom-${names.join("-")}`,
+        name,
+        ingredients: names,
+        time: Math.min(24, 10 + names.length * 2),
+        flavor: "按手头食材走",
+        colors: ["#007aff", "#34c759"],
+        steps: [
+          `${names.join("、")}洗净切成大小接近的片或段，难熟的先切薄一点。`,
+          "热锅下油，先放蒜末，再按从硬到软的顺序下锅翻炒。",
+          "加盐和生抽调味，若锅太干就沿边淋一小勺水。",
+          "食材断生后点几滴醋，转大火翻匀出锅。"
+        ]
+      };
+    }
+
+    function photoFor(recipe) {
+      return state.photos[recipeKey(recipe)];
+    }
+
+    function renderThumb(recipe) {
+      const photo = photoFor(recipe);
+      const colors = recipe.colors || ["#007aff", "#34c759"];
+      const klass = photo ? "thumb has-photo" : "thumb";
+      return `<span class="${klass}" style="--a:${colors[0]};--b:${colors[1]}">${photo ? `<img src="${photo}" alt="${recipe.name}">` : ""}</span>`;
+    }
+
+    function renderIngredients() {
+      els.ingredients.innerHTML = "";
+      state.ingredients.forEach(item => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `chip${state.selected.has(item.name) ? " selected" : ""}`;
+        button.style.setProperty("--accent", item.color);
+        button.innerHTML = `<span class="dot"></span><span>${item.name}</span>`;
+        button.addEventListener("click", () => {
+          if (state.selected.has(item.name)) state.selected.delete(item.name);
+          else state.selected.add(item.name);
+          saveState();
+          render();
+        });
+        els.ingredients.appendChild(button);
+      });
+    }
+
+    function renderRandom(recipe) {
+      if (!recipe) {
+        els.randomTag.textContent = "点一下随机";
+        els.randomTime.textContent = "约 0 分钟";
+        els.randomName.textContent = "等锅热起来";
+        els.randomMeta.innerHTML = "";
+        els.randomCard.onclick = null;
+        return;
+      }
+      els.randomTag.textContent = recipe.flavor;
+      els.randomTime.textContent = `约 ${recipe.time} 分钟`;
+      els.randomName.textContent = recipe.name;
+      els.randomMeta.innerHTML = [
+        ...recipe.ingredients.map(name => `<span class="pill">${name}</span>`),
+        `<span class="pill">基础调料</span>`
+      ].join("");
+      els.randomCard.onclick = () => openRecipe(recipe);
+    }
+
+    function renderRecipes(list) {
+      els.recipes.innerHTML = "";
+      els.listCount.textContent = list.length;
+      if (!list.length) {
+        els.recipes.innerHTML = `<div class="glass empty">至少选择两种食材，就能组合出一道快手素炒。</div>`;
+        return;
+      }
+      list.forEach(recipe => {
+        const row = document.createElement("button");
+        row.type = "button";
+        row.className = "recipe";
+        row.innerHTML = `
+          ${renderThumb(recipe)}
+          <span>
+            <h3>${recipe.name}</h3>
+            <p>${recipe.ingredients.join("、")} · ${recipe.flavor} · 约 ${recipe.time} 分钟</p>
+          </span>
+          <span class="chevron" aria-hidden="true"></span>
+        `;
+        row.addEventListener("click", () => openRecipe(recipe));
+        els.recipes.appendChild(row);
+      });
+    }
+
+    function renderCalendar() {
+      const d = state.calendarDate;
+      const year = d.getFullYear();
+      const month = d.getMonth();
+      els.calendarTitle.textContent = `${year} 年 ${month + 1} 月`;
+      els.calendarDays.innerHTML = "";
+      const first = new Date(year, month, 1);
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const pad = first.getDay();
+      for (let i = 0; i < pad; i += 1) {
+        const blank = document.createElement("span");
+        blank.className = "day";
+        blank.style.visibility = "hidden";
+        els.calendarDays.appendChild(blank);
+      }
+      const today = todayKey();
+      for (let day = 1; day <= daysInMonth; day += 1) {
+        const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+        const cell = document.createElement("span");
+        cell.className = `day${key === today ? " current" : ""}${state.meals[key] ? " has-meal" : ""}`;
+        cell.textContent = day;
+        cell.title = state.meals[key]?.name || "";
+        els.calendarDays.appendChild(cell);
+      }
+      renderMealList();
+    }
+
+    function renderMealList() {
+      const d = state.calendarDate;
+      const monthPrefix = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const meals = Object.entries(state.meals)
+        .filter(([date]) => date.startsWith(monthPrefix))
+        .sort(([a], [b]) => b.localeCompare(a));
+      els.monthMealCount.textContent = `${meals.length} 条`;
+      els.historyCount.textContent = Object.keys(state.meals).length;
+      els.homeMealCount.textContent = Object.keys(state.meals).length;
+      if (!meals.length) {
+        els.mealList.innerHTML = `<div class="glass empty">这个月还没有记录。随机出一道菜后，点“记到今天”。</div>`;
+        return;
+      }
+      els.mealList.innerHTML = "";
+      meals.forEach(([date, meal]) => {
+        const recipe = allRecipes().find(item => item.name === meal.name) || mealToRecipe(meal);
+        const row = document.createElement("button");
+        row.type = "button";
+        row.className = "meal-item";
+        row.innerHTML = `
+          ${renderThumb(recipe)}
+          <span>
+            <h3>${meal.name}</h3>
+            <p>${date} · ${meal.ingredients.join("、")}</p>
+          </span>
+          <span class="chevron" aria-hidden="true"></span>
+        `;
+        row.addEventListener("click", () => openRecipe(recipe));
+        els.mealList.appendChild(row);
+      });
+    }
+
+    function render() {
+      const list = availableRecipes();
+      renderIngredients();
+      renderRecipes(list);
+      els.selectedCount.textContent = state.selected.size;
+      els.heroNumber.textContent = state.selected.size;
+      els.recipeCount.textContent = list.length;
+      els.homeIngredientCount.textContent = state.selected.size;
+      els.homeRecipeCount.textContent = list.length;
+      els.randomHint.textContent = list.length ? "可随机" : "缺食材";
+      if (state.randomRecipe && !list.some(item => recipeKey(item) === recipeKey(state.randomRecipe))) {
+        state.randomRecipe = null;
+      }
+      renderRandom(state.randomRecipe);
+      renderCalendar();
+    }
+
+    function mealToRecipe(meal) {
+      return {
+        id: meal.recipeId || `meal-${meal.name}`,
+        name: meal.name,
+        ingredients: meal.ingredients || [],
+        time: meal.time || 15,
+        flavor: "历史记录",
+        colors: ["#007aff", "#34c759"],
+        steps: [
+          "这是从记录页恢复的历史菜品。",
+          "如果想查看完整做法，可以在菜谱页重新打开对应菜谱。",
+          "也可以重新随机或添加食材，让系统生成新的做法。"
+        ]
+      };
+    }
+
+    function spinRandom() {
+      const list = availableRecipes();
+      if (!list.length) {
+        showToast("先选两种以上食材");
+        return;
+      }
+      const dayKey = todayKey();
+      const history = Array.isArray(state.randomHistory[dayKey]) ? state.randomHistory[dayKey] : [];
+      const blocked = new Set(history.slice(0, 3));
+      const freshList = list.filter(recipe => !blocked.has(recipeKey(recipe)));
+      const pool = history.length < 3 && freshList.length ? freshList : list;
+      els.randomButton.disabled = true;
+      els.randomButton.textContent = "翻锅中...";
+      let ticks = 0;
+      const total = 18;
+      const step = () => {
+        const recipe = pool[Math.floor(Math.random() * pool.length)];
+        state.randomRecipe = recipe;
+        renderRandom(recipe);
+        ticks += 1;
+        if (ticks >= total) {
+          state.randomHistory[dayKey] = [...history, recipeKey(recipe)].slice(-12);
+          saveState();
+          els.randomButton.disabled = false;
+          els.randomButton.innerHTML = `
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M16 3h5v5"></path><path d="M4 20 21 3"></path><path d="M21 16v5h-5"></path><path d="M15 15l6 6"></path><path d="M4 4l5 5"></path>
+            </svg>
+            随机一道
+          `;
+          const todayTimes = Math.min(state.randomHistory[dayKey].length, 3);
+          showToast(`今晚就吃：${state.randomRecipe.name} · 今日第 ${todayTimes} 次`);
+          return;
+        }
+        window.setTimeout(step, 48 + ticks * 8);
+      };
+      step();
+    }
+
+    function recordMeal(recipe) {
+      if (!recipe) {
+        showToast("先随机或打开一道菜");
+        return;
+      }
+      const key = todayKey();
+      state.meals[key] = {
+        name: recipe.name,
+        ingredients: recipe.ingredients,
+        recipeId: recipeKey(recipe),
+        recordedAt: new Date().toISOString()
+      };
+      saveState();
+      render();
+      showToast(`已记录：${recipe.name}`);
+    }
+
+    function openRecipe(recipe) {
+      state.activeRecipe = recipe;
+      els.sheetTitle.textContent = recipe.name;
+      const colors = recipe.colors || ["#007aff", "#34c759"];
+      els.sheetPhoto.style.setProperty("--a", colors[0]);
+      els.sheetPhoto.style.setProperty("--b", colors[1]);
+      const photo = photoFor(recipe);
+      els.sheetPhoto.innerHTML = photo ? `<img src="${photo}" alt="${recipe.name}">` : `<span>${recipe.name}</span>`;
+      els.sheetIngredients.innerHTML = [
+        ...recipe.ingredients.map(name => `<span class="mini">${name}</span>`),
+        `<span class="mini">基础调料</span>`,
+        `<span class="mini">${recipe.time || 15} 分钟</span>`
+      ].join("");
+      els.sheetSteps.innerHTML = (recipe.steps || []).map(step => `<li>${step}</li>`).join("");
+      els.modal.classList.add("show");
+      els.modal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeRecipe() {
+      els.modal.classList.remove("show");
+      els.modal.setAttribute("aria-hidden", "true");
+    }
+
+    function switchTab(tabName) {
+      state.activeTab = tabName;
+      els.views.forEach(view => view.classList.toggle("active", view.dataset.view === tabName));
+      els.tabs.forEach(tab => tab.classList.toggle("active", tab.dataset.tab === tabName));
+    }
+
+    function showToast(message) {
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => els.toast.classList.remove("show"), 1700);
+    }
+
+    function updateClock() {
+      const now = new Date();
+      els.clock.textContent = now.toLocaleTimeString("zh-CN", { hour: "numeric", minute: "2-digit", hour12: false });
+    }
+
+    function handlePhotoUpload(file) {
+      if (!file || !state.activeRecipe) return;
+      if (!file.type.startsWith("image/")) {
+        showToast("请选择图片文件");
+        return;
+      }
+      showToast("正在处理图片...");
+      resizeImage(file, 900, 0.82)
+        .then(dataUrl => {
+          state.photos[recipeKey(state.activeRecipe)] = dataUrl;
+          saveState();
+          openRecipe(state.activeRecipe);
+          render();
+          showToast("菜图已更新");
+        })
+        .catch(() => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            state.photos[recipeKey(state.activeRecipe)] = reader.result;
+            saveState();
+            openRecipe(state.activeRecipe);
+            render();
+            showToast("菜图已更新");
+          };
+          reader.readAsDataURL(file);
+        });
+    }
+
+    function resizeImage(file, maxSize, quality) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        const url = URL.createObjectURL(file);
+        image.onload = () => {
+          const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.max(1, Math.round(image.width * scale));
+          canvas.height = Math.max(1, Math.round(image.height * scale));
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+          URL.revokeObjectURL(url);
+          resolve(canvas.toDataURL("image/jpeg", quality));
+        };
+        image.onerror = () => {
+          URL.revokeObjectURL(url);
+          reject(new Error("image load failed"));
+        };
+        image.src = url;
+      });
+    }
+
+    els.addForm.addEventListener("submit", event => {
+      event.preventDefault();
+      const name = els.newIngredient.value.trim().replace(/\s+/g, "");
+      if (!name) return;
+      if (state.ingredients.some(item => item.name === name)) {
+        showToast("这个食材已经在列表里");
+        return;
+      }
+      state.ingredients.push({ name, color: ["#007aff", "#ff9f0a", "#af52de", "#5856d6"][state.ingredients.length % 4] });
+      state.selected.add(name);
+      els.newIngredient.value = "";
+      saveState();
+      render();
+      showToast(`已添加，并更新菜谱：${name}`);
+    });
+
+    els.randomButton.addEventListener("click", spinRandom);
+    els.recordTodayButton.addEventListener("click", () => recordMeal(state.randomRecipe));
+    els.recordFromSheetButton.addEventListener("click", () => recordMeal(state.activeRecipe));
+    els.selectAllButton.addEventListener("click", () => {
+      state.selected = new Set(state.ingredients.map(item => item.name));
+      saveState();
+      render();
+      showToast("已全选食材");
+    });
+    els.defaultOnlyButton.addEventListener("click", () => {
+      state.selected = new Set(starterIngredients.map(item => item.name));
+      saveState();
+      render();
+      showToast("已恢复默认五种");
+    });
+    els.prevMonthButton.addEventListener("click", () => {
+      state.calendarDate = new Date(state.calendarDate.getFullYear(), state.calendarDate.getMonth() - 1, 1);
+      renderCalendar();
+    });
+    els.nextMonthButton.addEventListener("click", () => {
+      state.calendarDate = new Date(state.calendarDate.getFullYear(), state.calendarDate.getMonth() + 1, 1);
+      renderCalendar();
+    });
+    els.photoInput.addEventListener("change", event => {
+      handlePhotoUpload(event.target.files[0]);
+      event.target.value = "";
+    });
+    els.closeModal.addEventListener("click", closeRecipe);
+    els.modal.addEventListener("click", event => {
+      if (event.target === els.modal) closeRecipe();
+    });
+    els.tabs.forEach(tab => tab.addEventListener("click", () => switchTab(tab.dataset.tab)));
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeRecipe();
+    });
+
+    loadState();
+    updateClock();
+    window.setInterval(updateClock, 30000);
+    render();
+  </script>
+</body>
+</html>
